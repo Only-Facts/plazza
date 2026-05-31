@@ -13,6 +13,7 @@ SRC =	src/main.cpp \
 		src/Message.cpp	\
 		src/PipeIPC.cpp	\
 		src/KitchenProcess.cpp	\
+		src/Logger.cpp	\
 		src/Reception.cpp
 
 OBJ = $(SRC:.cpp=.o)
