@@ -1,6 +1,7 @@
 #include "Stock.hpp"
 
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 
 Stock::Stock() {
@@ -13,6 +14,16 @@ Stock::Stock() {
   _ingredients[Ingredient::Eggplant] = 5;
   _ingredients[Ingredient::GoatCheese] = 5;
   _ingredients[Ingredient::ChiefLove] = 5;
+}
+
+std::string Stock::getStockString() const {
+  std::lock_guard<std::mutex> lock(_mutex);
+  std::ostringstream ss;
+  ss << "  Stock:\n";
+  for (const auto& pair : _ingredients) {
+    ss << "    - " << ingredientToString(pair.first) << ": " << pair.second << "\n";
+  }
+  return ss.str();
 }
 
 std::vector<Ingredient> Stock::getIngredientsForPizza(const Pizza& pizza) const {

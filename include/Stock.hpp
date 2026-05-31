@@ -23,6 +23,7 @@ class Stock {
 public:
   Stock();
 
+  std::string getStockString() const;
   bool hasIngredients(const Pizza& pizza) const;
   bool tryConsumeIngredients(const Pizza& pizza);
   void consumeIngredients(const Pizza& pizza);

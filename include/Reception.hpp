@@ -6,12 +6,13 @@
 class Reception {
 public:
   Reception(double _multiplier, int cooksPerKitchen, int restockTime);
+  ~Reception();
 
   void run();
 
 private:
   void handleOrder(const std::string& input);
-  void displayStatus() const;
+  void displayStatus();
 
   double _multiplier;
   int _cooksPerKitchen;
