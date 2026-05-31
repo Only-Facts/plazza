@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Kitchen.hpp"
 #include "KitchenProcess.hpp"
 #include "Pizza.hpp"
 
@@ -10,23 +9,28 @@
 class KitchenManager {
 public:
   KitchenManager(int cooksPerKitchen, double multiplier, int restockTime);
+  ~KitchenManager();
 
-  void assignPizza(const Pizza& pizza);
+  KitchenManager(const KitchenManager&) = delete;
+  KitchenManager& operator=(const KitchenManager&) = delete;
+
   void assignPizzaToProcess(const Pizza& pizza);
-  void displayStatus() const;
+  void displayStatus();
+  void update();
+  void shutdown();
 
 private:
-  Kitchen& getBestKitchen();
-  void createKitchen();
-
   KitchenProcess& createKitchenProcess();
   KitchenProcess& getBestKitchenProcess();
+  void removeClosedProcesses();
+  void cleanupDeadProcesses();
+  bool handleKitchenMessage(std::size_t index);
 
   int _cooksPerKitchen;
   double _multiplier;
   int _restockTime;
   int _nextKitchenId;
+  bool _shuttingDown;
 
-  std::vector<std::unique_ptr<Kitchen>> _kitchens;
-  std::vector<KitchenProcess> _processKitchens;
+  std::vector<std::unique_ptr<KitchenProcess>> _processKitchens;
 };
