@@ -1,0 +1,4 @@
+plazza
+compile_commands.json
+*.o
+logs/
