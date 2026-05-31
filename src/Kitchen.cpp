@@ -1,19 +1,14 @@
 #include "Kitchen.hpp"
 
 #include <iostream>
+#include <sstream>
 #include <thread>
 #include <chrono>
 #include <stdexcept>
 
-Kitchen::Kitchen(int id, int cooksCount, double multiplier, int restockTime)
-  : _id(id),
-    _cooksCount(cooksCount),
-    _multiplier(multiplier),
-    _restockTime(restockTime),
-    _maxCapacity(cooksCount * 2),
-    _stock(),
-    _threadPool(cooksCount, multiplier, _stock),
-    _running(true)
+Kitchen::Kitchen(int id, int cooksCount, double multiplier, int restockTime, std::function<void(const Pizza&)> onPizzaDone)
+  : _id(id), _cooksCount(cooksCount), _multiplier(multiplier), _restockTime(restockTime), _maxCapacity(cooksCount * 2),
+    _stock(), _threadPool(cooksCount, multiplier, _stock, onPizzaDone), _running(true)
 {
   _stockThread = std::thread(&Kitchen::stockRegenerationLoop, this);
 }
@@ -23,6 +18,16 @@ Kitchen::~Kitchen() {
 
   if (_stockThread.joinable())
     _stockThread.join();
+}
+
+std::string Kitchen::getStatusString() const {
+  std::ostringstream ss;
+  ss << "\n--- Kitchen " << _id << " Status ---\n"
+     << "  Cooks occupancy: " << _threadPool.getBusyCooks() << "/" << _cooksCount << "\n"
+     << "  Waiting tasks: " << _threadPool.getWaitingTasks() << "\n"
+     << "  Load: " << getLoad() << "/" << _maxCapacity << "\n"
+     << _stock.getStockString();
+  return ss.str();
 }
 
 void Kitchen::stockRegenerationLoop() {

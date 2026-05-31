@@ -3,14 +3,21 @@
 #include "Pizza.hpp"
 #include "Stock.hpp"
 #include "ThreadPool.hpp"
+#include "Message.hpp"
+#include <atomic>
+#include <functional>
+#include <mutex>
+#include <string>
+#include <thread>
 
 class Kitchen {
 public:
-  Kitchen(int id, int cooksCount, double multiplier, int restockTime);
+  Kitchen(int id, int cooksCount, double multiplier, int restockTime, std::function<void(const Pizza&)> onPizzaDone = nullptr);
   ~Kitchen();
   bool canAcceptPizza() const;
   void addPizza(const Pizza& pizza);
 
+  std::string getStatusString() const;
   int getLoad() const;
   int getCapacity() const;
   int getId() const;
