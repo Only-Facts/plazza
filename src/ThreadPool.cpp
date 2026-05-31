@@ -6,12 +6,8 @@
 #include <mutex>
 #include <string>
 
-ThreadPool::ThreadPool(int cooksCount, double multiplier, Stock& stock)
-  : _cooksCount(cooksCount),
-    _multiplier(multiplier),
-    _stock(stock),
-    _running(true),
-    _busyCooks(0)
+ThreadPool::ThreadPool(int cooksCount, double multiplier, Stock& stock, std::function<void(const Pizza&)> onPizzaDone)
+  : _onPizzaDone(onPizzaDone), _cooksCount(cooksCount), _multiplier(multiplier), _stock(stock), _running(true), _busyCooks(0)
 {
   for (int i = 0; i < _cooksCount; i++)
     _workers.emplace_back(&ThreadPool::workerLoop, this, i + 1);
@@ -79,34 +75,15 @@ void ThreadPool::workerLoop(int cookId) {
 
 void ThreadPool::cookPizza(int cookId, const Pizza& pizza) {
   if (!_stock.tryConsumeIngredients(pizza)) {
-    safePrint(
-      "Cook " + std::to_string(cookId)
-      + " cannot cook "
-      + pizza.typeToString()
-      + " "
-      + pizza.sizeToString()
-      + ": not enough ingredients"
-    );
+    safePrint("Cook " + std::to_string(cookId) + " cannot cook " + pizza.typeToString() + ": not enough ingredients");
     return;
   }
-
-  safePrint(
-    "Cook " + std::to_string(cookId)
-    + " is cooking "
-    + pizza.typeToString()
-    + " "
-    + pizza.sizeToString()
-  );
-
+  safePrint("Cook " + std::to_string(cookId) + " is cooking " + pizza.typeToString() + " " + pizza.sizeToString());
   std::this_thread::sleep_for(std::chrono::milliseconds(getCookingTimeMs(pizza)));
+  safePrint("Cook " + std::to_string(cookId) + " finished " + pizza.typeToString() + " " + pizza.sizeToString());
 
-  safePrint(
-    "Cook " + std::to_string(cookId)
-    + " finished "
-    + pizza.typeToString()
-    + " "
-    + pizza.sizeToString()
-  );
+  if (_onPizzaDone)
+    _onPizzaDone(pizza);
 }
 
 int ThreadPool::getCookingTimeMs(const Pizza& pizza) const {

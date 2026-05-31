@@ -5,14 +5,16 @@
 
 #include <vector>
 #include <queue>
+#include <string>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
 #include <atomic>
+#include <functional>
 
 class ThreadPool {
 public:
-    ThreadPool(int cooksCount, double multiplier, Stock& stock);
+    ThreadPool(int cooksCount, double multiplier, Stock& stock, std::function<void(const Pizza&)> onPizzaDone);
     ~ThreadPool();
 
     void addTask(const Pizza& pizza);
@@ -25,6 +27,8 @@ private:
     void cookPizza(int cookId, const Pizza& pizza);
     int getCookingTimeMs(const Pizza& pizza) const;
     void safePrint(const std::string& message) const;
+
+    std::function<void(const Pizza&)> _onPizzaDone;
 
     int _cooksCount;
     double _multiplier;
