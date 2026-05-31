@@ -1,31 +1,32 @@
 #include "Reception.hpp"
 
+#include <csignal>
+#include <cstdlib>
 #include <iostream>
 #include <stdexcept>
-#include <cstdlib>
 
 static double parseMultiplier(const char* value)
 {
-    double multiplier = std::stod(value);
+  double multiplier = std::stod(value);
 
-    if (multiplier <= 0)
-        throw std::invalid_argument("Multiplier must be greater than 0");
-
-    return multiplier;
+  if (multiplier <= 0)
+    throw std::invalid_argument("Multiplier must be greater than 0");
+  return multiplier;
 }
 
 static int parsePositiveInt(const char* value, const std::string& name)
 {
-    int number = std::stoi(value);
+  int number = std::stoi(value);
 
-    if (number <= 0)
-        throw std::invalid_argument(name + " must be greater than 0");
-
-    return number;
+  if (number <= 0)
+    throw std::invalid_argument(name + " must be greater than 0");
+  return number;
 }
 
+int main(int argc, char** argv)
+{
+  std::signal(SIGPIPE, SIG_IGN);
 
-int main(int argc, char** argv) {
   if (argc != 4) {
     std::cerr << "Usage: ./plazza multiplier cooks_per_kitchen restock_time" << std::endl;
     return 84;
